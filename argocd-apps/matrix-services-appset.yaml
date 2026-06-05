@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: matrix-with-filter
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+        generators:
+          # Generator 1: Quét tìm tất cả thư mục service con trong thư mục services/
+          - git:
+              repoURL: https://github.com/trungtu0207-collab/my-argo.git
+              revision: main
+              directories:
+                - path: services/*
+          # Generator 2: Định nghĩa danh sách các môi trường muốn triển khai
+          - list:
+              elements:
+                - env: dev
+                - env: prd
+        # BỘ LỌC CHUYÊN NGHIỆP: Chỉ sinh ra Application nếu file values của môi trường đó tồn tại
+        # Giúp tránh lỗi hoàn toàn khi service A có 'dev' nhưng chưa có 'prd'
+        selector:
+          matchExpressions:
+            - key: repository.file.exists
+              operator: In
+              values:
+                - "services/{{matrix.git.path.basename}}/values-{{matrix.list.env}}.yaml"
+  template:
+    metadata:
+      # Tên hiển thị trên Argo CD UI. Ví dụ: payment-service-dev, order-service-prd
+      name: '{{matrix.git.path.basename}}-{{matrix.list.env}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/trungtu0207-collab/my-argo.git
+        targetRevision: main
+        # Đường dẫn trỏ thẳng vào thư mục chứa Chart.yaml của service đó
+        path: '{{matrix.git.path}}'
+        
+        # Cấu hình Helm nạp file values tương ứng
+        helm:
+          valueFiles:
+            # Vì Argo CD đang đứng tại thư mục 'path' ở trên, file values nằm cùng cấp
+            - 'values-{{matrix.list.env}}.yaml'
+            
+      destination:
+        server: https://kubernetes.default.svc
+        # Tự động đẩy vào namespace tương ứng với môi trường: dev hoặc prd
+        namespace: '{{matrix.list.env}}'
+      
+      # Chính sách đồng bộ tự động của Argo CD
+      syncPolicy:
+        automated:
+          prune: true        # Tự động xóa tài nguyên trên K8s nếu trên Git đã xóa
+          selfHeal: true     # Tự động đồng bộ lại nếu ai đó sửa tay dưới K8s Cluster
+        syncOptions:
+          - CreateNamespace=true # Tự động tạo namespace (dev/prd) nếu chưa có sẵn
