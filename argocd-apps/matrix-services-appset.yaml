@@ -28,7 +28,6 @@ spec:
 
         helm:
           valueFiles:
-            - values.yaml
             - 'envs/{{ .valueFile }}'
 
       destination:
