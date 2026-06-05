@@ -1,5 +1,0 @@
-replicaCount: 1
-envName: order-production
-env: prd
-namespace: prd
-valueFile: values-prd.yaml
