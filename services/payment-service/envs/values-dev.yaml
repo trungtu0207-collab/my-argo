@@ -1,0 +1,5 @@
+replicaCount: 1
+envName: payment-development
+env: dev
+namespace: dev
+valueFile: values-dev.yaml

@@ -1,0 +1,5 @@
+replicaCount: 1 # Chạy nhiều pod hơn ở Production
+envName: payment-production
+env: prd
+namespace: prd
+valueFile: values-prd.yaml

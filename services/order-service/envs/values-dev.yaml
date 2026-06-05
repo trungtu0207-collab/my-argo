@@ -1,0 +1,5 @@
+replicaCount: 1
+envName: order-development
+env: dev
+namespace: dev
+valueFile: values-dev.yaml

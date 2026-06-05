@@ -1,2 +1,0 @@
-replicaCount: 1 # Chạy nhiều pod hơn ở Production
-envName: payment-production
