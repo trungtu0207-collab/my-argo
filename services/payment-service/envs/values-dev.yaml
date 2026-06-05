@@ -1,4 +1,7 @@
 replicaCount: 1
+image:
+  repository: nginxdemos/hello
+  tag: plain-text
 envName: payment-development
 env: dev
 namespace: dev

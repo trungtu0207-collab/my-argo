@@ -1,4 +1,7 @@
 replicaCount: 1 # Chạy nhiều pod hơn ở Production
+image:
+  repository: nginxdemos/hello
+  tag: plain-text
 envName: payment-production
 env: prd
 namespace: prd
